@@ -17,6 +17,17 @@ String nome = "Nome_oh_rei";
 WiFiClient picoClient;
 PubSubClient mqttClient(picoClient);
 
+void connectToWiFi() {
+    Serial.printf("\n[WIFI] A ligar a: %s ", WIFI_SSID);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.println(" LIGADO!");
+}
 
 //função de callback para não fazer fuckass polling
 void callback(char* topic, byte* payload, unsigned int length) {
@@ -34,6 +45,11 @@ void callback(char* topic, byte* payload, unsigned int length) {
 //Funçãozinha muito importante
 void reconnectMQTT() {
     while (!mqttClient.connected()) {
+
+        if (WiFi.status() != WL_CONNECTED) {
+            connectToWiFi();
+        }
+
         Serial.print("[MQTT] A ligar ao Broker online...");
         
         //clientID para fins de organização
@@ -56,11 +72,8 @@ void setup() {
     Serial.begin(115200);
     delay(2000); // Aguarda a abertura da porta série
     
-     WiFi.begin(WIFI_SSID, WIFI_PASS);
+     connectToWiFi();
 
-     while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-    }
 
     // Configura o Broker, a Porta e a função de callback do PubSubClient
     mqttClient.setServer(MQTT_BROKER, MQTT_PORT);
@@ -68,6 +81,7 @@ void setup() {
 }
 
 void loop() {
+
     // Garante que se mantém ligado ao broker MQTT
     if (!mqttClient.connected()) {
         reconnectMQTT();
