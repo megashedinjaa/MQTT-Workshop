@@ -3,16 +3,13 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-#define WIFI_SSID "Pirocossauro";
-#define WIFI_PASS "qwertyui";
-
-#define MQTT_BROKER "broker.hivemq.com";
-#define MQTT_PORT 1883;
-
-#define MQTT_TOPIC "ws-mqtt/sonar";
-
-String nome = "pico5";
-String clientId = "PicoW_Client_" + nome;
+#define WIFI_SSID "wifi"
+#define WIFI_PASS "password"
+#define MQTT_BROKER "broker.hivemq.com"
+#define MQTT_PORT 1883
+#define MQTT_ID "picow-1234"
+#define MQTT_PUB_TOPIC "topic"
+#define MQTT_SUB_TOPIC "topic"
 
 // ------------------------CONFIGURAÇÃO do Sonar (HC-SR04)----------------------------------------------
 // Pinos digitais para Trigger e Echo (ajusta aos pinos onde ligaste na placa)
@@ -39,7 +36,7 @@ void reconnectMQTT() {
 
     JsonDocument LWT;
 
-    LWT["dispositivo"] = clientId;
+    LWT["dispositivo"] = MQTT_ID;
     LWT["estado"] = "offline"; 
     LWT["local"] = "FEUP/I202";
 
@@ -48,7 +45,7 @@ void reconnectMQTT() {
 
     JsonDocument back_online;
 
-    back_online["dispositivo"] = clientId;
+    back_online["dispositivo"] = MQTT_ID;
     back_online["estado"] = "online"; 
     back_online["local"] = "FEUP/I202";
 
@@ -61,10 +58,10 @@ void reconnectMQTT() {
         }
         Serial.print("[MQTT] A ligar ao Broker central...");
 
-        if (mqttClient.connect(clientId.c_str(), MQTT_TOPIC, 1, true, lwt.c_str())) {
+        if (mqttClient.connect(MQTT_ID, MQTT_SUB_TOPIC, 1, true, lwt.c_str())) {
             Serial.println(" Conectado!");
 
-            mqttClient.publish(MQTT_TOPIC, online.c_str(), true);
+            mqttClient.publish(MQTT_SUB_TOPIC, online.c_str(), true);
         } else {
             Serial.printf(" Falha (rc=%d). Nova tentativa...\n", mqttClient.state());
             delay(3000);
@@ -105,14 +102,14 @@ void publicarJson(float distancia) {
 
     JsonDocument doc;
 
-    doc["dispositivo"] = clientId;
+    doc["dispositivo"] = MQTT_ID;
     doc["distancia_cm"] = serialized(String(distancia, 2)); 
     doc["local"] = "FEUP/I202";
 
     String payload;
     serializeJson(doc, payload);
 
-    mqttClient.publish(MQTT_TOPIC, payload.c_str());
+    mqttClient.publish(MQTT_PUB_TOPIC, payload.c_str());
     Serial.printf("[MQTT TX] Publicado: %s\n", payload.c_str());
 }
 

@@ -3,16 +3,13 @@
 #include <PubSubClient.h>
 
 
-const char* WIFI_SSID = "SSID";
-const char* WIFI_PASS = "wifi_pass";
-
-
-const char* MQTT_BROKER = "broker.hivemq.com";
-const uint16_t MQTT_PORT = 1883;
-
-const char* MQTT_TOPIC = "pipitest";
-String nome = "Nome_oh_rei";
-
+#define WIFI_SSID "wifi"
+#define WIFI_PASS "password"
+#define MQTT_BROKER "broker.hivemq.com"
+#define MQTT_PORT 1883
+#define MQTT_ID "picow-1234"
+#define MQTT_PUB_TOPIC "topic"
+#define MQTT_SUB_TOPIC "topic"
 
 WiFiClient picoClient;
 PubSubClient mqttClient(picoClient);
@@ -51,16 +48,13 @@ void reconnectMQTT() {
         }
 
         Serial.print("[MQTT] A ligar ao Broker online...");
-        
-        //clientID para fins de organização
-        String clientId = "PicoW_Client_" + nome;
 
             //CLientID é preciso aqui para o broker saber quem somos
-        if (mqttClient.connect(clientId.c_str())) {
+        if (mqttClient.connect(MQTT_ID)) {
 
             // Subscreve novamente ao tópico após recuperar a ligação
-            mqttClient.subscribe(MQTT_TOPIC);
-            Serial.printf("[MQTT] Subscrito ao tópico: %s\n", MQTT_TOPIC);
+            mqttClient.subscribe(MQTT_PUB_TOPIC);
+            Serial.printf("[MQTT] Subscrito ao tópico: %s\n", MQTT_PUB_TOPIC);
         } else {
             Serial.printf(" Falha (rc=%d). Nova tentativa em 3 segundos...\n", mqttClient.state());
             delay(3000);
