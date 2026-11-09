@@ -28,7 +28,7 @@ void loop() {
   // we continue here
 }
 
-void callback(const char *topic, uint8_t *payload, unsigned int plength) {
+void callback(const char *topic, uint8_t *payload, unsigned int length) {
   // callback
 }
 
