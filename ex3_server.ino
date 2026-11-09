@@ -14,19 +14,6 @@
 WiFiClient wifi;
 PubSubClient mqtt(wifi);
 
-void setup() {
-  Serial.begin(115200);
-  WiFi.mode(WIFI_STA);
-  mqtt.setServer(MQTT_BROKER, MQTT_PORT);
-  mqtt.setCallback(callback);
-}
-
-void loop() {
-  ensureWiFi();
-  ensureMQTT();
-  mqtt.loop();
-}
-
 void callback(char *topic, uint8_t *payload, unsigned int length) {
   if (!strcmp(topic, MQTT_REQ_TOPIC)) {
     JsonDocument inDoc;
@@ -42,7 +29,7 @@ void callback(char *topic, uint8_t *payload, unsigned int length) {
     sprintf(nameTopic, "%s/led/%s", MQTT_TOPIC, name);
     JsonDocument outDoc;
     outDoc["name"] = MQTT_ID;
-    outDoc["setLed"] = true;
+    outDoc["setLed"] = random(0, 2) == 1; // randomly set the LED state to true or false
     uint8_t buffer[128];
     size_t len = serializeJson(outDoc, buffer);
     mqtt.publish(nameTopic, buffer, len);
@@ -76,4 +63,17 @@ void ensureMQTT() {
   if (mqtt.subscribe(MQTT_SUB_TOPIC))
     Serial.println(" SUBSCRIBED!");
   else Serial.println(" SUBSCRIBE FAILED");
+}
+
+void setup() {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  mqtt.setServer(MQTT_BROKER, MQTT_PORT);
+  mqtt.setCallback(callback);
+}
+
+void loop() {
+  ensureWiFi();
+  ensureMQTT();
+  mqtt.loop();
 }
