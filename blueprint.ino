@@ -28,7 +28,9 @@ void loop() {
   // we continue here
 }
 
-void callback(const char *topic, uint8 *payload, unsigned int plength)
+void callback(const char *topic, uint8_t *payload, unsigned int plength) {
+  // callback
+}
 
 void ensureWiFi() {
   if (WiFi.status() == WL_CONNECTED) return;
