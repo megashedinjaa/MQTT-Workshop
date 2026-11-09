@@ -3,13 +3,13 @@
 #include <ArduinoJson.h>
 
 #define WIFI_SSID "wifi"
-#define WIFI_PASS "vbcu6774"
+#define WIFI_PASS "wifi"
 #define MQTT_BROKER "broker.hivemq.com"
 #define MQTT_PORT 1883
-#define MQTT_ID "bob"
+#define MQTT_ID "mjfbgkdasjfnjksn"
 #define MQTT_TOPIC "ws-mqtt"
-#define MQTT_SUB_TOPIC "ws-mqtt/#"
-#define MQTT_REQ_TOPIC "pipitest/requests"
+#define MQTT_SUB_TOPIC "ws-mqtt/led/mjfbgkdasjfnjksn"
+#define MQTT_REQ_TOPIC "ws-mqtt/requests"
 
 WiFiClient wifi;
 PubSubClient mqtt(wifi);
@@ -26,22 +26,21 @@ void loop() {
   ensureMQTT();
   mqtt.loop();
 
-  mqtt.publish("ws-mqtt/requests", "{\"name\":\"mary\"}");
+  mqtt.publish("ws-mqtt/requests", "{\"name\":\"mjfbgkdasjfnjksn\"}");
   delay(1000);
 }
 
 void callback(char *topic, uint8_t *payload, unsigned int length) {
-  if (!strcmp(topic, "ws-mqtt/led/mary")) {
-    JsonDocument doc;
-    DeserializationError err = deserializeJson(doc, payload, length);
-    if (err) {
-      Serial.print("Error: ");
-      Serial.println(err.c_str());
-      return;
-    }
-    bool ledBool = doc["setLed"] | false;
-    digitalWrite(LED_BUILTIN, ledBool ? 1 : 0);
+  Serial.println("got it");
+  JsonDocument doc;
+  DeserializationError err = deserializeJson(doc, payload, length);
+  if (err) {
+    Serial.print("Error: ");
+    Serial.println(err.c_str());
+    return;
   }
+  bool ledBool = doc["setLed"] | false;
+  digitalWrite(LED_BUILTIN, ledBool ? 1 : 0);
 }
 
 void ensureWiFi() {
