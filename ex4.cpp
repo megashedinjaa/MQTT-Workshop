@@ -103,7 +103,7 @@ void publicarJson(float distancia) {
     JsonDocument doc;
 
     doc["dispositivo"] = MQTT_ID;
-    doc["distancia_cm"] = serialized(String(distancia, 2)); 
+    doc["distancia_cm"] = distancia; 
     doc["local"] = "FEUP/I202";
 
     String payload;
