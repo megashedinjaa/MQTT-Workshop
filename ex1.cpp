@@ -1,79 +1,53 @@
-#include <Arduino.h>
-#include <WiFi.h>
 #include <PubSubClient.h>
+#include <WiFi.h>
+#include <ArduinoJson.h>
 
+#define WIFI_SSID "iPhone"
+#define WIFI_PASS "POBREPLEBE3"
+#define MQTT_BROKER "broker.hivemq.com"
+#define MQTT_PORT 1883
+#define MQTT_ID "piconame"
+#define MQTT_PUB_TOPIC "ws-mqtt/demo"
 
-const char* WIFI_SSID = "SSID";
-const char* WIFI_PASS = "WIFI_PASSWORD";
-
-
-const char* MQTT_BROKER = "broker.hivemq.com";
-const uint16_t MQTT_PORT = 1883;
-
-const char* MQTT_TOPIC = "pipitest";
-String nome = "Nome_oh_rei";
-
-WiFiClient picoClient;
-PubSubClient mqttClient(picoClient);
-
-void connectToWiFi() {
-    Serial.printf("\n[WIFI] A ligar a: %s ", WIFI_SSID);
-    WiFi.mode(WIFI_STA);
-    WiFi.begin(WIFI_SSID, WIFI_PASS);
-
-    while (WiFi.status() != WL_CONNECTED) {
-        delay(500);
-        Serial.print(".");
-    }
-    Serial.println(" LIGADO!");
-}
-
-void reconnectMQTT() {
-
-    String clientId = "PicoW_Client_" + nome;
-
-     while (!mqttClient.connected()) {
-
-        if (WiFi.status() != WL_CONNECTED) {
-            connectToWiFi();
-        }
-
-        Serial.print("[MQTT] A ligar ao Broker...");
-
-        if (mqttClient.connect(clientId.c_str())) {
-            Serial.println(" Conectado!");
-        } else {
-            Serial.printf(" Falha (rc=%d). Nova tentativa...\n", mqttClient.state());
-            delay(3000);
-        }
-    }
-}
+WiFiClient wifiClient;
+PubSubClient mqttClient(wifiClient);
 
 void setup() {
-    Serial.begin(115200);
-    delay(2000); // Aguarda a abertura da porta série
-    
-     connectToWiFi();
-
-    // Configura o servidor e a função de callback do PubSubClient
-    mqttClient.setServer(MQTT_BROKER, MQTT_PORT);
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  mqttClient.setServer(MQTT_BROKER, MQTT_PORT);
 }
 
 void loop() {
+  ensureWiFi();
+  ensureMQTT();
+  mqttClient.loop();
 
-    // Garante que se mantém ligado ao broker MQTT
-    if (!mqttClient.connected()) {
-        reconnectMQTT();
+  // Publicação de ambas as mensagens através do mesmo cliente ativo
+  mqttClient.publish(MQTT_PUB_TOPIC, "o nosso grupo é o melhor ");
+  delay(5000);
+}
+
+void ensureWiFi() {
+  if (WiFi.status() == WL_CONNECTED) return;
+
+  while (WiFi.status() != WL_CONNECTED) {
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    unsigned long start = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
+      delay(500);
+      Serial.print(".");
     }
-    
-    // Mantém a escuta de pacotes ativa e processa o buffer de rede
-    mqttClient.loop();
- 
+  }
+  Serial.println(" CONNECTED TO WIFI!");
+}
 
-    static unsigned long lastPublish = 0;
-    if (millis() - lastPublish >= 10000) {
-        lastPublish = millis();
+void ensureMQTT() {
+  if (mqttClient.connected()) return;
 
-        mqttClient.publish(MQTT_TOPIC, "és um coco");
-        } 
-    }
+  while (!mqttClient.connected()) {
+    Serial.print(".");
+    if (!mqttClient.connect(MQTT_ID)) delay(1000);
+  }
+  Serial.println(" CONNECTED TO MQTT!");
+}
