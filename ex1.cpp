@@ -2,8 +2,8 @@
 #include <WiFi.h>
 #include <ArduinoJson.h>
 
-#define WIFI_SSID "iPhone"
-#define WIFI_PASS "POBREPLEBE3"
+#define WIFI_SSID "wifi_name"
+#define WIFI_PASS "wifi_pass"
 #define MQTT_BROKER "broker.hivemq.com"
 #define MQTT_PORT 1883
 #define MQTT_ID "piconame"
