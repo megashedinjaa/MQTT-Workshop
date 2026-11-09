@@ -6,7 +6,7 @@
 #define WIFI_PASS "password"
 #define MQTT_BROKER "broker.hivemq.com"
 #define MQTT_PORT 1883
-#define MQTT_ID "picow-1234"
+#define MQTT_ID "pico_name"
 #define MQTT_PUB_TOPIC "topic"
 #define MQTT_SUB_TOPIC "topic"
 
