@@ -2,14 +2,14 @@
 #include <WiFi.h>
 #include <ArduinoJson.h>
 
-#define WIFI_SSID "wifi_name"
-#define WIFI_PASS "wifi_password"
+#define WIFI_SSID "wifi"
+#define WIFI_PASS "vbcu6774"
 #define MQTT_BROKER "broker.hivemq.com"
 #define MQTT_PORT 1883
-#define MQTT_ID "pico_name"
+#define MQTT_ID "bob"
 #define MQTT_TOPIC "ws-mqtt"
 #define MQTT_SUB_TOPIC "ws-mqtt/#"
-#define MQTT_REQ_TOPIC "ws-mqtt/requests"
+#define MQTT_REQ_TOPIC "pipitest/requests"
 
 WiFiClient wifi;
 PubSubClient mqtt(wifi);
@@ -25,27 +25,22 @@ void loop() {
   ensureWiFi();
   ensureMQTT();
   mqtt.loop();
+
+  mqtt.publish("ws-mqtt/requests", "{\"name\":\"mary\"}");
+  delay(1000);
 }
 
 void callback(char *topic, uint8_t *payload, unsigned int length) {
-  if (!strcmp(topic, MQTT_REQ_TOPIC)) {
-    JsonDocument inDoc;
-    DeserializationError err = deserializeJson(inDoc, payload, length);
+  if (!strcmp(topic, "ws-mqtt/led/mary")) {
+    JsonDocument doc;
+    DeserializationError err = deserializeJson(doc, payload, length);
     if (err) {
       Serial.print("Error: ");
       Serial.println(err.c_str());
       return;
     }
-    const char *name = inDoc["name"] | "N/A";
-    if (!strcmp(name, "N/A")) return;
-    char nameTopic[128] = "";
-    sprintf(nameTopic, "%s/led/%s", MQTT_PUB_TOPIC, name);
-    JsonDocument outDoc;
-    outDoc["name"] = MQTT_ID;
-    outDoc["setLed"] = true;
-    uint8_t buffer[128];
-    size_t len = serializeJson(outDoc, buffer);
-    mqtt.publish(nameTopic, buffer, len);
+    bool ledBool = doc["setLed"] | false;
+    digitalWrite(LED_BUILTIN, ledBool ? 1 : 0);
   }
 }
 
