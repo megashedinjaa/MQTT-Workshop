@@ -7,8 +7,8 @@
 #define MQTT_BROKER "broker.hivemq.com"
 #define MQTT_PORT 1883
 #define MQTT_ID "picow-1234"
-#define MQTT_PUB_TOPIC "pipitest"
-#define MQTT_SUB_TOPIC "pipitest"
+#define MQTT_PUB_TOPIC "topic"
+#define MQTT_SUB_TOPIC "topic"
 
 WiFiClient wifi;
 PubSubClient mqtt(wifi);
