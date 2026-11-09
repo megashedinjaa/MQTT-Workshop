@@ -1,59 +1,59 @@
-  #include <PubSubClient.h>
-  #include <WiFi.h>
-  #include <ArduinoJson.h>
+#include <PubSubClient.h>
+#include <WiFi.h>
+#include <ArduinoJson.h>
 
-  #define WIFI_SSID "wifi"
-  #define WIFI_PASS "password"
-  #define MQTT_BROKER "broker.hivemq.com"
-  #define MQTT_PORT 1883
-  #define MQTT_ID "picow-1234"
-  #define MQTT_PUB_TOPIC "pipitest"
-  #define MQTT_SUB_TOPIC "pipitest"
+#define WIFI_SSID "wifi"
+#define WIFI_PASS "password"
+#define MQTT_BROKER "broker.hivemq.com"
+#define MQTT_PORT 1883
+#define MQTT_ID "picow-1234"
+#define MQTT_PUB_TOPIC "pipitest"
+#define MQTT_SUB_TOPIC "pipitest"
 
-  WiFiClient wifi;
-  PubSubClient mqtt(wifi);
+WiFiClient wifi;
+PubSubClient mqtt(wifi);
 
-  void setup() {
-    Serial.begin(115200);
-    WiFi.mode(WIFI_STA);
-    mqtt.setServer(MQTT_BROKER, MQTT_PORT);
-    mqtt.setCallback(callback);
-  }
+void setup() {
+  Serial.begin(115200);
+  WiFi.mode(WIFI_STA);
+  mqtt.setServer(MQTT_BROKER, MQTT_PORT);
+  mqtt.setCallback(callback);
+}
 
-  void loop() {
-    ensureWiFi();
-    ensureMQTT();
-    mqtt.loop();
+void loop() {
+  ensureWiFi();
+  ensureMQTT();
+  mqtt.loop();
 
-    // we continue here
-  }
+  // we continue here
+}
 
-  void callback(const char *topic, uint8 *payload, unsigned int plength)
+void callback(const char *topic, uint8 *payload, unsigned int plength)
 
-  void ensureWiFi() {
-    if (WiFi.status() == WL_CONNECTED) return;
+void ensureWiFi() {
+  if (WiFi.status() == WL_CONNECTED) return;
 
-    while (WiFi.status() != WL_CONNECTED) {
-      WiFi.begin(WIFI_SSID, WIFI_PASS);
-      unsigned long start = millis(); // starts the timeout
-      while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
-        delay(500);
-        Serial.print(".");
-      }
-    }
-    Serial.println(" CONNECTED TO WIFI!");
-  }
-
-  void ensureMQTT() {
-    if (mqtt.connected()) return;
-
-    while (!mqtt.connected()) {
+  while (WiFi.status() != WL_CONNECTED) {
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    unsigned long start = millis(); // starts the timeout
+    while (WiFi.status() != WL_CONNECTED && millis() - start < 10000) {
+      delay(500);
       Serial.print(".");
-      if (!mqtt.connect(MQTT_ID)) delay(1000);
     }
-    Serial.println(" CONNECTED TO MQTT!");
-
-    // only reached after a fresh connect, because of the early return above
-    if (mqtt.subscribe(MQTT_SUB_TOPIC)) Serial.println(" SUBSCRIBED!");
-    else Serial.println(" SUBSCRIBE FAILED");
   }
+  Serial.println(" CONNECTED TO WIFI!");
+}
+
+void ensureMQTT() {
+  if (mqtt.connected()) return;
+
+  while (!mqtt.connected()) {
+    Serial.print(".");
+    if (!mqtt.connect(MQTT_ID)) delay(1000);
+  }
+  Serial.println(" CONNECTED TO MQTT!");
+
+  // only reached after a fresh connect, because of the early return above
+  if (mqtt.subscribe(MQTT_SUB_TOPIC)) Serial.println(" SUBSCRIBED!");
+  else Serial.println(" SUBSCRIBE FAILED");
+}
