@@ -3,20 +3,21 @@
 #include <PubSubClient.h>
 #include <ArduinoJson.h>
 
-const char* WIFI_SSID = "Pirocossauro";
-const char* WIFI_PASS = "qwertyui";
+#define WIFI_SSID "Pirocossauro";
+#define WIFI_PASS "qwertyui";
 
-const char* MQTT_BROKER = "broker.hivemq.com";
-const uint16_t MQTT_PORT = 1883;
+#define MQTT_BROKER "broker.hivemq.com";
+#define MQTT_PORT 1883;
 
-const char* MQTT_TOPIC = "pipitest/I202/distance";
+#define MQTT_TOPIC "ws-mqtt/sonar";
+
 String nome = "pico5";
 String clientId = "PicoW_Client_" + nome;
 
 // ------------------------CONFIGURAÇÃO do Sonar (HC-SR04)----------------------------------------------
 // Pinos digitais para Trigger e Echo (ajusta aos pinos onde ligaste na placa)
-const int TRIG_PIN = 14; 
-const int ECHO_PIN = 15;
+#define TRIG_PIN 14; 
+#define ECHO_PIN 15;
 //------------------------------------------------------------------------------------------------------
 
 WiFiClient picoClient;
@@ -34,7 +35,6 @@ void connectToWiFi() {
     Serial.println(" LIGADO!");
 }
 
-// Reconnect com LWT 
 void reconnectMQTT() {
 
     JsonDocument LWT;
