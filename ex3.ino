@@ -39,7 +39,7 @@ void callback(char *topic, uint8_t *payload, unsigned int length) {
     const char *name = inDoc["name"] | "N/A";
     if (!strcmp(name, "N/A")) return;
     char nameTopic[128] = "";
-    sprintf(nameTopic, "%s/led/%s", MQTT_PUB_TOPIC, name);
+    sprintf(nameTopic, "%s/led/%s", MQTT_TOPIC, name);
     JsonDocument outDoc;
     outDoc["name"] = MQTT_ID;
     outDoc["setLed"] = true;
